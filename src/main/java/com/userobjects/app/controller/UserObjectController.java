@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.userobjects.app.model.ResponseModel;
 import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.service.UserObjectsService;
+import com.userobjects.app.utilities.utilities;
 
 @RestController
 public class UserObjectController {
 	
 	@Autowired
 	UserObjectsService userObjectService;
+	
+	
+	utilities utils = new utilities();
 	
 	@GetMapping(value = "/test")
 	public ResponseModel testIt() {
@@ -39,6 +43,7 @@ public class UserObjectController {
 			resp.setMessage("That id exists");
 		} else { 
 			userObject.setDateAdded(new Date());
+			utils.validateObjectType(userObject);
 			userObjectService.addUserObject(userObject);
 			resp.setCode(200);
 			resp.setMessage("OK");

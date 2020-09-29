@@ -6,7 +6,8 @@ data = {
     "rightAcension": "19:23:15",
     "declination": "-23:43:19",
     "otherCatalogueId": "SAO 12345",
-    "description": "my  object"
+    "description": "my  object",
+    "type": "bob"
     }
 
 

@@ -17,6 +17,7 @@ public class UserDefinedObject {
 		private String declination;
 		private String otherCatalogueId;
 		private String description;
+		private String type;
 		
 		public UserDefinedObject() {}
 }
