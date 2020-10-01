@@ -1,11 +1,24 @@
+server:
+  port: 8081
+  
+  data:
+    mongodb:
+      host: 10.152.183.113
+      port: 27017
+      database: CustomObjects
+---
+  
 spring: 
+  profiles: dev
   data: 
     mongodb: 
-      host: 192.168.1.210 
+      host: 172.17.0.2
       port: 27017 
       database: CustomObjects
 
 
-server:
-  port: 8081
+---
+
+
+
   

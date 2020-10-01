@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.SpringVersion;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ public class UserObjectController {
 	public ResponseModel testIt() {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);
-		resp.setMessage("yup made it here");
+		resp.setMessage(SpringVersion.getVersion());
 		return resp;
 	}
 	
