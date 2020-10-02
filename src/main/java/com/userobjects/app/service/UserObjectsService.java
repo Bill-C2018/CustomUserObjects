@@ -22,5 +22,8 @@ public class UserObjectsService {
 	public List<UserDefinedObject> findMyObjectId(String objectId) {
 		return userObjects.findByMyObjectId(objectId);
 	}
-
+	
+	public void deleteUserObject(String objectId) {
+		userObjects.deleteById(objectId);
+	}
 }

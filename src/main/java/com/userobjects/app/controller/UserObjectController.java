@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,12 +59,32 @@ public class UserObjectController {
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(objectId);
 		if(newObj.size() == 0)	{
-			resp.setCode(400);
+			resp.setCode(404);
 			resp.setMessage("not found");
 		} else {
 			resp.setCode(200);
 			resp.setMessage("OK");
 			resp.setObjects(newObj);
+		}
+		return resp;
+	}
+	
+	@DeleteMapping(value ="/deletemyobjectid/{objectId}") 
+	public ResponseModel deleteByMyObjectId(@PathVariable String objectId) {
+		ResponseModel resp = new ResponseModel();
+		List<UserDefinedObject> deleteObj = userObjectService.findMyObjectId(objectId);
+		if(deleteObj.size() == 1)
+		{
+			userObjectService.deleteUserObject(deleteObj.get(0).getId());
+			resp.setCode(200);
+			resp.setMessage("Deleted");
+		}
+		else if(deleteObj.size() == 0) {
+			resp.setCode(404);
+			resp.setMessage("object not found");
+		} else if(deleteObj.size() > 1) {
+			resp.setCode(409);
+			resp.setMessage("multiple objects found");
 		}
 		return resp;
 	}
