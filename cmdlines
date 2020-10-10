@@ -1,0 +1,7 @@
+$ docker build --build-arg JAR_FILE=build/libs/*.jar -t customuserobjects:test .
+
+mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*.jar)
+
+docker build --build-arg DEPENDENCY=build/dependency -t customuserobjects:test .
+
+
