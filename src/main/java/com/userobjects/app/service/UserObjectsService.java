@@ -26,4 +26,7 @@ public class UserObjectsService {
 	public void deleteUserObject(String objectId) {
 		userObjects.deleteById(objectId);
 	}
+	public void updateUserObject(UserDefinedObject object) {
+		userObjects.save(object);
+	}
 }

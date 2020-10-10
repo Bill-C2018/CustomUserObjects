@@ -3,9 +3,9 @@ package com.userobjects.app.utilities;
 import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.UserDefinedObject;
 
-public class utilities {
+public class Utilities {
 	
-	public utilities() {}
+	public Utilities() {}
 	
 	public void validateObjectType(UserDefinedObject object) {
 		
@@ -29,9 +29,10 @@ public class utilities {
 			return;
 		} 
 		
-		object.setType(ObjectTypes.OTHER);
-		
+		object.setType(ObjectTypes.OTHER);		
 		
 	}
+	
+
 
 }

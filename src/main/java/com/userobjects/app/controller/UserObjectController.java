@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.userobjects.app.model.ResponseModel;
 import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.service.UserObjectsService;
-import com.userobjects.app.utilities.utilities;
+import com.userobjects.app.utilities.Utilities;
 
 @RestController
 public class UserObjectController {
@@ -25,7 +25,7 @@ public class UserObjectController {
 	UserObjectsService userObjectService;
 	
 	
-	utilities utils = new utilities();
+	Utilities utils = new Utilities();
 	
 	@GetMapping(value = "/test")
 	public ResponseModel testIt() {
@@ -88,5 +88,28 @@ public class UserObjectController {
 		}
 		return resp;
 	}
+	
+	@PostMapping(value = "/editobject")
+	public ResponseModel editObject(@RequestBody UserDefinedObject userObject) {
+		
+		ResponseModel resp = new ResponseModel();
+		List<UserDefinedObject> editObj = userObjectService.findMyObjectId(userObject.objectId);
+		if(editObj.size() == 1) {
+		
+			UserDefinedObject oldObj = editObj.get(0);
+			oldObj.updateObject(userObject);
+			resp.setCode(200);
+			resp.setMessage("updated");			
+					
+		}
+		else if(editObj.size() == 0) {
+			resp.setCode(404);
+			resp.setMessage("object not found");
+		} else if(editObj.size() > 1) {
+			resp.setCode(409);
+			resp.setMessage("multiple objects found");
+		}
+		return resp;
+		
 
 }
