@@ -1,6 +1,7 @@
 package com.userobjects.app.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,10 @@ public class UserObjectsService {
 	
 	public List<UserDefinedObject> findMyObjectId(String objectId) {
 		return userObjects.findByMyObjectId(objectId);
+	}
+	
+	public Optional<UserDefinedObject> findById(String Id) {
+		return userObjects.findById(Id);
 	}
 	
 	public void deleteUserObject(String objectId) {

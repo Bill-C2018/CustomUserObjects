@@ -1,7 +1,9 @@
 package com.userobjects.app.controller;
 
+
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.ResponseModel;
 import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.service.UserObjectsService;
@@ -25,7 +28,8 @@ public class UserObjectController {
 	UserObjectsService userObjectService;
 	
 	
-	Utilities utils = new Utilities();
+	@Autowired
+	Utilities utils;
 	
 	@GetMapping(value = "/test")
 	public ResponseModel testIt() {
@@ -33,6 +37,15 @@ public class UserObjectController {
 		resp.setCode(200);
 		resp.setMessage(SpringVersion.getVersion());
 		return resp;
+	}
+	
+	@GetMapping(value = "/types")
+	public ResponseModel getTypes() {
+		ResponseModel resp = new ResponseModel();
+		resp.setCode(200);	
+		resp.setTypes(ObjectTypes.toArrayList());
+		return resp;
+		
 	}
 	
 	
@@ -46,6 +59,7 @@ public class UserObjectController {
 			resp.setMessage("That id exists");
 		} else { 
 			userObject.setDateAdded(new Date());
+			//Set to 'OTHER' if not valid type
 			utils.validateObjectType(userObject);
 			userObjectService.addUserObject(userObject);
 			resp.setCode(200);
@@ -93,23 +107,18 @@ public class UserObjectController {
 	public ResponseModel editObject(@RequestBody UserDefinedObject userObject) {
 		
 		ResponseModel resp = new ResponseModel();
-		List<UserDefinedObject> editObj = userObjectService.findMyObjectId(userObject.objectId);
-		if(editObj.size() == 1) {
-		
-			UserDefinedObject oldObj = editObj.get(0);
+		Optional<UserDefinedObject> editObj = userObjectService.findById(userObject.getId());
+		if (!editObj.isEmpty()) {
+			UserDefinedObject oldObj = editObj.get();
 			oldObj.updateObject(userObject);
+			userObjectService.updateUserObject(oldObj);
 			resp.setCode(200);
 			resp.setMessage("updated");			
-					
-		}
-		else if(editObj.size() == 0) {
+		} else {
 			resp.setCode(404);
-			resp.setMessage("object not found");
-		} else if(editObj.size() > 1) {
-			resp.setCode(409);
-			resp.setMessage("multiple objects found");
+			resp.setMessage("object not found");			
 		}
 		return resp;
-		
+	}
 
 }

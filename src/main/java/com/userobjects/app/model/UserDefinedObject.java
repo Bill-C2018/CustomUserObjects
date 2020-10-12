@@ -2,9 +2,10 @@ package com.userobjects.app.model;
 
 import java.util.Date;
 
+
 import org.springframework.data.annotation.Id;
 
-
+import com.userobjects.app.utilities.Utilities;
 
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import lombok.Data;
 
 @Data
 public final class UserDefinedObject {
+	
 
 		@Id
 		public String id;
@@ -30,35 +32,32 @@ public final class UserDefinedObject {
 		}
 		
 		public void updateObject(UserDefinedObject newObject) {
-			if(notNull(newObject.dateAdded)) {
+			if(Utilities.notNull(newObject.dateAdded)) {
 				this.dateAdded = newObject.dateAdded;
 			}
-			if(notNull(newObject.myObjectId)) {
+			if(Utilities.notNull(newObject.myObjectId)) {
 				this.myObjectId = newObject.myObjectId;
 			}
-			if(notNull(newObject.rightAcension)) {
+			if(Utilities.notNull(newObject.rightAcension)) {
 				this.rightAcension = newObject.rightAcension;
 			}
-			if(notNull(newObject.declination)) {
+			if(Utilities.notNull(newObject.declination)) {
 				this.declination = newObject.declination;
 			}
-			if(notNull(newObject.description)) {
+			if(Utilities.notNull(newObject.otherCatalogueId)) {
+				this.otherCatalogueId = newObject.otherCatalogueId;
+			}
+			if(Utilities.notNull(newObject.description)) {
 				this.description = newObject.description;
 			}
-			if(notNull(newObject.type)) {
+			if(Utilities.notNull(newObject.type)) {
 				this.type = newObject.type;
 			}
-			if(notNull(newObject.userId)) {
+			if(Utilities.notNull(newObject.userId)) {
 				this.userId = newObject.userId;
 			}
 
-
 		}
 		
-		static  <T> Boolean notNull(T n)  {
-			if (n == null) {
-				return false;
-			}
-			return true;
-		}		
+	
 }

@@ -3,15 +3,14 @@ package com.userobjects.app.model;
 import java.util.List;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class ResponseModel {
 
-	@Getter @Setter private int  code;
-	@Getter @Setter private String message;
+	private int  code;
+	private String message;
 	private List<UserDefinedObject> objects;
+	private List<String> types;
 	
 	public ResponseModel() {}
 	

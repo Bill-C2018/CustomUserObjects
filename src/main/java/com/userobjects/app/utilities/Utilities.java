@@ -1,8 +1,11 @@
 package com.userobjects.app.utilities;
 
+import org.springframework.stereotype.Component;
+
 import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.UserDefinedObject;
 
+@Component
 public class Utilities {
 	
 	public Utilities() {}
@@ -32,6 +35,14 @@ public class Utilities {
 		object.setType(ObjectTypes.OTHER);		
 		
 	}
+	
+	public static <T> Boolean notNull(T n)  {
+		if( n == null ) {
+			return false;
+		} else {
+			return true;
+		}
+	}	
 	
 
 
