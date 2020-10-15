@@ -108,7 +108,7 @@ public class UserObjectController {
 		
 		ResponseModel resp = new ResponseModel();
 		Optional<UserDefinedObject> editObj = userObjectService.findById(userObject.getId());
-		if (!editObj.isEmpty()) {
+		if (!editObj.isPresent()) {
 			UserDefinedObject oldObj = editObj.get();
 			oldObj.updateObject(userObject);
 			userObjectService.updateUserObject(oldObj);
