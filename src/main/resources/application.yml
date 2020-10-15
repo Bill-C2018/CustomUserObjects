@@ -1,9 +1,10 @@
 server:
   port: 8081
-  
+ 
+spring:
   data:
     mongodb:
-      host: 10.152.183.113
+      host: 10.1.243.242
       port: 27017
       database: CustomObjects
 ---

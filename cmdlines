@@ -4,4 +4,4 @@ mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*.jar)
 
 docker build --build-arg DEPENDENCY=build/dependency -t customuserobjects:test .
 
-
+docker run -p 8081:8081 <name> -d (or t to run in terminal) 
