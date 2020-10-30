@@ -7,11 +7,13 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +23,7 @@ import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.service.UserObjectsService;
 import com.userobjects.app.utilities.Utilities;
 
+@CrossOrigin
 @RestController
 public class UserObjectController {
 	
@@ -31,8 +34,9 @@ public class UserObjectController {
 	@Autowired
 	Utilities utils;
 	
+
 	@GetMapping(value = "/test")
-	public ResponseModel testIt() {
+	public ResponseModel testIt(@RequestHeader(value = "referer", required = false) String r) {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);
 		resp.setMessage(SpringVersion.getVersion());
@@ -51,7 +55,7 @@ public class UserObjectController {
 	
 	@PostMapping(value = "/submitobject")
 	public ResponseModel submitObject(@RequestBody UserDefinedObject userObject) {
-		
+
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
 		if(newObj.size() != 0) {
@@ -68,8 +72,11 @@ public class UserObjectController {
 		return resp;
 	}
 	
+
 	@GetMapping(value = "/userobject")
-	public ResponseModel getUserObjectbyMyUserId(@RequestParam String objectId) {
+	public ResponseModel getUserObjectbyMyUserId(@RequestHeader(value = "referer", required = false) String r,
+													@RequestParam String objectId) {
+
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(objectId);
 		if(newObj.size() == 0)	{

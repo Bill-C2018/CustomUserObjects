@@ -29,6 +29,7 @@ public final class UserDefinedObject {
 		
 		public UserDefinedObject() {
 			this.version = "0.01";
+			this.userId = "1";
 		}
 		
 		public void updateObject(UserDefinedObject newObject) {
