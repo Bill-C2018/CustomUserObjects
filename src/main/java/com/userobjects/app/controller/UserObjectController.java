@@ -5,8 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.userobjects.app.model.ObjectTypes;
@@ -27,23 +32,27 @@ import com.userobjects.app.utilities.Utilities;
 @RestController
 public class UserObjectController {
 	
-	@Autowired
-	UserObjectsService userObjectService;
+	Logger logger = LoggerFactory.getLogger(UserObjectController.class);
 	
+	@Autowired
+	private UserObjectsService userObjectService;
 	
 	@Autowired
 	Utilities utils;
 	
 
 	@GetMapping(value = "/test")
-	public ResponseModel testIt(@RequestHeader(value = "referer", required = false) String r) {
+	@ResponseBody 
+	public ResponseEntity<ResponseModel> testIt(@RequestHeader(value = "referer", required = false) String r) {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);
-		resp.setMessage(SpringVersion.getVersion());
-		return resp;
+		String message = "Version = " + SpringVersion.getVersion();
+		resp.setMessage(message);
+		return  ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
 	@GetMapping(value = "/types")
+	@ResponseBody
 	public ResponseModel getTypes() {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);	
@@ -54,45 +63,66 @@ public class UserObjectController {
 	
 	
 	@PostMapping(value = "/submitobject")
-	public ResponseModel submitObject(@RequestBody UserDefinedObject userObject) {
+	public ResponseEntity<ResponseModel> submitObject(@RequestBody UserDefinedObject userObject) {
 
+		String errorCode = "";
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
 		if(newObj.size() != 0) {
+			logger.info("Duplicate Object found objectId: {}",userObject.getMyObjectId());
+			
 			resp.setCode(409);
 			resp.setMessage("That id exists");
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
 		} else { 
 			userObject.setDateAdded(new Date());
 			//Set to 'OTHER' if not valid type
 			utils.validateObjectType(userObject);
-			userObjectService.addUserObject(userObject);
-			resp.setCode(200);
-			resp.setMessage("OK");
+			logger.info("calling validate object");
+			errorCode = utils.validateObjectFields(userObject);
+			if (errorCode == "") {
+				userObjectService.addUserObject(userObject);
+				logger.info("Succesfully added object { }",userObject.getMyObjectId());
+				resp.setCode(200);
+				resp.setMessage("OK");
+				return ResponseEntity.status(HttpStatus.OK).body(resp);
+			} else {
+				logger.info("Failed to add object { },{ } ",userObject.getMyObjectId(),errorCode);
+				resp.setMessage(errorCode);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+			}
+			
+
 		}
-		return resp;
+		
 	}
 	
 
 	@GetMapping(value = "/userobject")
-	public ResponseModel getUserObjectbyMyUserId(@RequestHeader(value = "referer", required = false) String r,
+	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(@RequestHeader(value = "referer", required = false) String r,
 													@RequestParam String objectId) {
 
+		logger.info("get object : object user id {}", objectId);
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(objectId);
 		if(newObj.size() == 0)	{
+			logger.info("Object { } not found",objectId);
 			resp.setCode(404);
 			resp.setMessage("not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
 		} else {
 			resp.setCode(200);
 			resp.setMessage("OK");
 			resp.setObjects(newObj);
 		}
-		return resp;
+		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
 	@DeleteMapping(value ="/deletemyobjectid/{objectId}") 
+	@ResponseBody
 	public ResponseModel deleteByMyObjectId(@PathVariable String objectId) {
 		ResponseModel resp = new ResponseModel();
+		logger.info("Delete object {}", objectId);
 		List<UserDefinedObject> deleteObj = userObjectService.findMyObjectId(objectId);
 		if(deleteObj.size() == 1)
 		{
@@ -101,9 +131,11 @@ public class UserObjectController {
 			resp.setMessage("Deleted");
 		}
 		else if(deleteObj.size() == 0) {
+			logger.info("Object not found");
 			resp.setCode(404);
 			resp.setMessage("object not found");
 		} else if(deleteObj.size() > 1) {
+			logger.info("multiple copies found");
 			resp.setCode(409);
 			resp.setMessage("multiple objects found");
 		}
@@ -111,21 +143,35 @@ public class UserObjectController {
 	}
 	
 	@PostMapping(value = "/editobject")
+	@ResponseBody
 	public ResponseModel editObject(@RequestBody UserDefinedObject userObject) {
-		
+		logger.info("update object { }",userObject.getUserId());
 		ResponseModel resp = new ResponseModel();
 		Optional<UserDefinedObject> editObj = userObjectService.findById(userObject.getId());
-		if (!editObj.isPresent()) {
+		if (editObj.isPresent()) {
 			UserDefinedObject oldObj = editObj.get();
 			oldObj.updateObject(userObject);
 			userObjectService.updateUserObject(oldObj);
+			logger.info("ojbect updated");
 			resp.setCode(200);
 			resp.setMessage("updated");			
 		} else {
+			logger.info("failed to update object");
 			resp.setCode(404);
 			resp.setMessage("object not found");			
 		}
 		return resp;
+	}
+	
+	@GetMapping("/listall/{filter}")
+	public ResponseEntity<ResponseModel> listAllofType(@PathVariable(name="filter")  String filter) {
+	
+		logger.info("In list all method with filter = {}",filter);
+		ResponseModel resp = new ResponseModel();
+		List results = userObjectService.findAllByType(filter);
+		resp.setObjects(results);
+		return ResponseEntity.ok(resp);
+	
 	}
 
 }
