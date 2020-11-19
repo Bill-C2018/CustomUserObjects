@@ -52,19 +52,18 @@ public class UserObjectController {
 	}
 	
 	@GetMapping(value = "/types")
-	@ResponseBody
-	public ResponseModel getTypes() {
+	public ResponseEntity<ResponseModel> getTypes() {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);	
 		resp.setTypes(ObjectTypes.toArrayList());
-		return resp;
-		
+		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
 	
 	@PostMapping(value = "/submitobject")
 	public ResponseEntity<ResponseModel> submitObject(@RequestBody UserDefinedObject userObject) {
-
+//	public ResponseEntity<ResponseModel> submitObject(@RequestBody String userObject) {
+		
 		String errorCode = "";
 		ResponseModel resp = new ResponseModel();
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
@@ -94,6 +93,7 @@ public class UserObjectController {
 			
 
 		}
+
 		
 	}
 	
@@ -120,7 +120,7 @@ public class UserObjectController {
 	
 	@DeleteMapping(value ="/deletemyobjectid/{objectId}") 
 	@ResponseBody
-	public ResponseModel deleteByMyObjectId(@PathVariable String objectId) {
+	public ResponseEntity<ResponseModel> deleteByMyObjectId(@PathVariable String objectId) {
 		ResponseModel resp = new ResponseModel();
 		logger.info("Delete object {}", objectId);
 		List<UserDefinedObject> deleteObj = userObjectService.findMyObjectId(objectId);
@@ -134,12 +134,14 @@ public class UserObjectController {
 			logger.info("Object not found");
 			resp.setCode(404);
 			resp.setMessage("object not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
 		} else if(deleteObj.size() > 1) {
 			logger.info("multiple copies found");
 			resp.setCode(409);
 			resp.setMessage("multiple objects found");
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
 		}
-		return resp;
+		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
 	@PostMapping(value = "/editobject")
