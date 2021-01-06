@@ -22,9 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.ResponseModel;
+import com.userobjects.app.model.Token;
 import com.userobjects.app.model.UserDefinedObject;
+import com.userobjects.app.model.UserObject;
 import com.userobjects.app.service.UserObjectsService;
 import com.userobjects.app.utilities.Utilities;
 
@@ -41,9 +44,9 @@ public class UserObjectController {
 	Utilities utils;
 	
 
-	@GetMapping(value = "/test")
+	@GetMapping(value = "/version/test")
 	@ResponseBody 
-	public ResponseEntity<ResponseModel> testIt(@RequestHeader(value = "referer", required = false) String r) {
+	public ResponseEntity<ResponseModel> testIt(@RequestHeader(value = "access-token", required = false) String r) {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);
 		String message = "Version = " + SpringVersion.getVersion();
@@ -51,7 +54,7 @@ public class UserObjectController {
 		return  ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
-	@GetMapping(value = "/types")
+	@GetMapping(value = "/userobject/types")
 	public ResponseEntity<ResponseModel> getTypes() {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);	
@@ -60,7 +63,7 @@ public class UserObjectController {
 	}
 	
 	
-	@PostMapping(value = "/submitobject")
+	@PostMapping(value = "/userobject/submitobject")
 	public ResponseEntity<ResponseModel> submitObject(@RequestBody UserDefinedObject userObject) {
 //	public ResponseEntity<ResponseModel> submitObject(@RequestBody String userObject) {
 		
@@ -98,7 +101,7 @@ public class UserObjectController {
 	}
 	
 
-	@GetMapping(value = "/userobject")
+	@GetMapping(value = "/userobject/userobject")
 	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(@RequestHeader(value = "referer", required = false) String r,
 													@RequestParam String objectId) {
 
@@ -118,7 +121,7 @@ public class UserObjectController {
 		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
-	@DeleteMapping(value ="/deletemyobjectid/{objectId}") 
+	@DeleteMapping(value ="/userobject/deletemyobjectid/{objectId}") 
 	@ResponseBody
 	public ResponseEntity<ResponseModel> deleteByMyObjectId(@PathVariable String objectId) {
 		ResponseModel resp = new ResponseModel();
@@ -144,7 +147,7 @@ public class UserObjectController {
 		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
-	@PostMapping(value = "/editobject")
+	@PostMapping(value = "/userobject/editobject")
 	@ResponseBody
 	public ResponseModel editObject(@RequestBody UserDefinedObject userObject) {
 		logger.info("update object { }",userObject.getUserId());
@@ -165,7 +168,7 @@ public class UserObjectController {
 		return resp;
 	}
 	
-	@GetMapping("/listall/{filter}")
+	@GetMapping("/userobject/listall/{filter}")
 	public ResponseEntity<ResponseModel> listAllofType(@PathVariable(name="filter")  String filter) {
 	
 		logger.info("In list all method with filter = {}",filter);
@@ -175,5 +178,7 @@ public class UserObjectController {
 		return ResponseEntity.ok(resp);
 	
 	}
+	
+			
 
 }

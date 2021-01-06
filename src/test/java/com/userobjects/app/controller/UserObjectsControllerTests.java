@@ -120,7 +120,7 @@ public class UserObjectsControllerTests {
 	@Test
 	void testItOnWeb() throws Exception {
 		String uri = "http://localhost:";
-		uri += port + "/test";
+		uri += port + "/version/test";
 		ResponseEntity<ResponseModel> response = this.restTemplate.getForEntity(uri, ResponseModel.class);
 		assertThat(response.getBody().getMessage()).contains("Version = 5.2.9.RELEASE");
 	}
@@ -138,7 +138,7 @@ public class UserObjectsControllerTests {
 		
 
 		String uri = "http://localhost:";
-		uri += port + "/userobject?objectId=00001";
+		uri += port + "/userobject/userobject?objectId=00001";
 		ResponseEntity<ResponseModel> response = this.restTemplate.getForEntity(uri, ResponseModel.class);
 		ResponseModel bdy = response.getBody();
 		List<UserDefinedObject> ll = bdy.getObjects();
@@ -147,7 +147,7 @@ public class UserObjectsControllerTests {
 		 // make sure not found works as well
 		 //
 		uri = "http://localhost:";
-		uri += port + "/userobject?objectId=00007";
+		uri += port + "/userobject/userobject?objectId=00007";
 		response = this.restTemplate.getForEntity(uri, ResponseModel.class);
 		bdy = response.getBody();
 		assertThat(bdy.getCode() == 404).isTrue();			

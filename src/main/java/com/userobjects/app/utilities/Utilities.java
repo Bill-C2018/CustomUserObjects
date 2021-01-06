@@ -65,7 +65,7 @@ public class Utilities {
 		return res;		
 	}
 	
-	public static <T> Boolean notNull(T n)  {
+	public static<T> Boolean notNull(T n)  {
 		if( n == null ) {
 			return false;
 		} else {

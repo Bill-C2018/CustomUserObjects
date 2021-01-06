@@ -23,6 +23,7 @@ public final class UserDefinedObject {
 
 		@Id
 		public String id;
+		private final String recordType;
 		private Date dateAdded;
 		private String myObjectId;
 		private String rightAcension;
@@ -36,6 +37,10 @@ public final class UserDefinedObject {
 		public UserDefinedObject() {
 			this.version = "0.01";
 			this.userId = "1";
+		}
+		
+		{
+			this.recordType = "USER_OBJECT";
 		}
 		
 		public void updateObject(UserDefinedObject newObject) {
