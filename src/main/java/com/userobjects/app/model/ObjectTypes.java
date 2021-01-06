@@ -3,6 +3,7 @@ package com.userobjects.app.model;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ObjectTypes {
 	
 	public static final String VARIABLE_STAR = "Variable Star";

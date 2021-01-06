@@ -16,8 +16,10 @@ public class UserObjectsService {
 	@Autowired
 	private UserDefinedObjectDao userObjects;
 	
-	public void addUserObject(UserDefinedObject object) {
+	
+	public int addUserObject(UserDefinedObject object) {
 		userObjects.save(object);
+		return 200;
 	}
 	
 	public List<UserDefinedObject> findMyObjectId(String objectId) {
@@ -31,7 +33,12 @@ public class UserObjectsService {
 	public void deleteUserObject(String objectId) {
 		userObjects.deleteById(objectId);
 	}
+	
 	public void updateUserObject(UserDefinedObject object) {
 		userObjects.save(object);
+	}
+	
+	public List<UserDefinedObject> findAllByType(String type) {
+		return userObjects.findAllByType(type);
 	}
 }
