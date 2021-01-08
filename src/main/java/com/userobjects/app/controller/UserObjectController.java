@@ -28,10 +28,13 @@ import com.userobjects.app.model.ResponseModel;
 import com.userobjects.app.model.Token;
 import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.model.UserObject;
+import com.userobjects.app.service.TokenRepositoryService;
+import com.userobjects.app.service.UserAthentication;
 import com.userobjects.app.service.UserObjectsService;
+import com.userobjects.app.service.UsersRepositoryService;
 import com.userobjects.app.utilities.Utilities;
 
-@CrossOrigin
+
 @RestController
 public class UserObjectController {
 	
@@ -39,6 +42,9 @@ public class UserObjectController {
 	
 	@Autowired
 	private UserObjectsService userObjectService;
+	
+	
+	UserAthentication userAthentication = new UserAthentication();
 	
 	@Autowired
 	Utilities utils;
@@ -102,11 +108,20 @@ public class UserObjectController {
 	
 
 	@GetMapping(value = "/userobject/userobject")
-	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(@RequestHeader(value = "referer", required = false) String r,
+	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(@RequestHeader(value = "access-token", required = true) String r,
 													@RequestParam String objectId) {
 
 		logger.info("get object : object user id {}", objectId);
+		logger.info("access-token -> {}", r);
+		
 		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(409);
+			resp.setMessage("access denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
+		}
+
+		
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(objectId);
 		if(newObj.size() == 0)	{
 			logger.info("Object { } not found",objectId);
@@ -123,8 +138,17 @@ public class UserObjectController {
 	
 	@DeleteMapping(value ="/userobject/deletemyobjectid/{objectId}") 
 	@ResponseBody
-	public ResponseEntity<ResponseModel> deleteByMyObjectId(@PathVariable String objectId) {
+	public ResponseEntity<ResponseModel> deleteByMyObjectId(
+			@RequestHeader(value = "access-token", required = true) String r,
+			@PathVariable String objectId) {
+		
 		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(409);
+			resp.setMessage("access denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
+		}
+
 		logger.info("Delete object {}", objectId);
 		List<UserDefinedObject> deleteObj = userObjectService.findMyObjectId(objectId);
 		if(deleteObj.size() == 1)
@@ -149,9 +173,18 @@ public class UserObjectController {
 	
 	@PostMapping(value = "/userobject/editobject")
 	@ResponseBody
-	public ResponseModel editObject(@RequestBody UserDefinedObject userObject) {
+	public ResponseModel editObject(
+			@RequestHeader(value = "access-token", required = true) String r,
+			@RequestBody UserDefinedObject userObject) {
+		
 		logger.info("update object { }",userObject.getUserId());
 		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(409);
+			resp.setMessage("access denied");
+			return resp;
+		}
+		
 		Optional<UserDefinedObject> editObj = userObjectService.findById(userObject.getId());
 		if (editObj.isPresent()) {
 			UserDefinedObject oldObj = editObj.get();
@@ -169,7 +202,9 @@ public class UserObjectController {
 	}
 	
 	@GetMapping("/userobject/listall/{filter}")
-	public ResponseEntity<ResponseModel> listAllofType(@PathVariable(name="filter")  String filter) {
+	public ResponseEntity<ResponseModel> listAllofType(
+			@RequestHeader(value = "access-token", required = true) String r,
+			@PathVariable(name="filter")  String filter) {
 	
 		logger.info("In list all method with filter = {}",filter);
 		ResponseModel resp = new ResponseModel();

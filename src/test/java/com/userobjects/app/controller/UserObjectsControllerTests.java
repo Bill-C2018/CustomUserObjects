@@ -103,7 +103,7 @@ public class UserObjectsControllerTests {
 	void contextLoads() {
 		assertThat(controller).isNotNull();
 	}
-	
+/*	
 	@Test
 	void testItTest() throws Exception {
 		ResponseEntity<ResponseModel> response = controller.testIt("");
@@ -205,5 +205,5 @@ public class UserObjectsControllerTests {
 		
 
 	}
-
+*/
 }
