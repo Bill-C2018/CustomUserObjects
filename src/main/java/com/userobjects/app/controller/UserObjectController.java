@@ -70,11 +70,17 @@ public class UserObjectController {
 	
 	
 	@PostMapping(value = "/userobject/submitobject")
-	public ResponseEntity<ResponseModel> submitObject(@RequestBody UserDefinedObject userObject) {
-//	public ResponseEntity<ResponseModel> submitObject(@RequestBody String userObject) {
+	public ResponseEntity<ResponseModel> submitObject(
+			@RequestHeader(value = "access-token", required = true) String r,
+			@RequestBody UserDefinedObject userObject) {
 		
 		String errorCode = "";
 		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(403);
+			resp.setMessage("access denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
+		}
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
 		if(newObj.size() != 0) {
 			logger.info("Duplicate Object found objectId: {}",userObject.getMyObjectId());
@@ -108,15 +114,16 @@ public class UserObjectController {
 	
 
 	@GetMapping(value = "/userobject/userobject")
-	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(@RequestHeader(value = "access-token", required = true) String r,
-													@RequestParam String objectId) {
+	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(
+						@RequestHeader(value = "access-token", required = true) String r,
+						@RequestParam String objectId) {
 
 		logger.info("get object : object user id {}", objectId);
 		logger.info("access-token -> {}", r);
 		
 		ResponseModel resp = new ResponseModel();
 		if (!userAthentication.isUserorAdmin(r)) {
-			resp.setCode(409);
+			resp.setCode(403);
 			resp.setMessage("access denied");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
 		}
@@ -208,6 +215,12 @@ public class UserObjectController {
 	
 		logger.info("In list all method with filter = {}",filter);
 		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(403);
+			resp.setMessage("access denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN ).body(resp);
+		}
+
 		List results = userObjectService.findAllByType(filter);
 		resp.setObjects(results);
 		return ResponseEntity.ok(resp);
