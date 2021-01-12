@@ -40,13 +40,14 @@ public class MyConfig implements WebMvcConfigurer {
     
 
 
-  
+/* 
+ 
     @Bean
     public UsersRepositoryService usersRepositoryService() {
     	return new UsersRepositoryServiceImp();
     }
   
-/*
+
     @Bean
     public TokenRepositoryService tokenRepositoryService() {
      	return new TokenRepositoryServiceImp();
