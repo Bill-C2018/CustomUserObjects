@@ -11,6 +11,15 @@ public class UserAuthenticationImpl implements UserAuthentication {
 	@Autowired
 	TokenRepositoryService tokenRepositoryService;
 	
+	public UserAuthenticationImpl() {
+		System.out.println("in default user auth constructor");
+	}
+	
+	public void setTokenRepositoryService(TokenRepositoryService service) {
+		System.out.println("in user auth setter");
+		this.tokenRepositoryService = service;
+	}
+	
 	public UserAuthenticationImpl(TokenRepositoryService service) {
 		System.out.println("in user auth constructor");
 		this.tokenRepositoryService = service;

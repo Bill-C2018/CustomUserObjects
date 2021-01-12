@@ -14,6 +14,14 @@ public class UsersRepositoryServiceImp implements UsersRepositoryService{
 	@Autowired
 	private UsersRepository usersRepo;
 	
+	public UsersRepositoryServiceImp() {
+		System.out.println("in default user repo service constructor");
+	}
+	public void setUsersRepo(UsersRepository usersRepo) {
+		System.out.println("in user repo service setter");
+		this.usersRepo = usersRepo;
+	}
+	
 	public UsersRepositoryServiceImp(UsersRepository usersRepo) {
 		System.out.println("in user repo service constructor");
 		this.usersRepo = usersRepo;

@@ -7,7 +7,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -24,7 +24,8 @@ public class SecurityInterceptor1 implements HandlerInterceptor{
 
 	
 //	TokenRepositoryService tokenRepositoryService = new TokenRepositoryServiceImp();
-	
+//	@Autowired
+//	TokenRepositoryService tokenRepositoryService;
 	
     @Override
     public boolean preHandle(HttpServletRequest request,HttpServletResponse  response,Object handler)
@@ -56,9 +57,10 @@ public class SecurityInterceptor1 implements HandlerInterceptor{
 				return true;
 			}
     	}
-		response.setStatus(409);
+		response.setStatus(403);
     	return false;   
 */
+
     }
 
     @Override
