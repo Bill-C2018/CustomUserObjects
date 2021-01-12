@@ -23,7 +23,7 @@ public final class UserDefinedObject {
 
 		@Id
 		public String id;
-		private final String recordType;
+		private String recordType;
 		private Date dateAdded;
 		private String myObjectId;
 		private String rightAcension;

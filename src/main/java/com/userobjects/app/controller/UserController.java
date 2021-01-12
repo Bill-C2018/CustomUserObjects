@@ -1,5 +1,6 @@
 package com.userobjects.app.controller;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.userobjects.app.model.Token;
 import com.userobjects.app.model.UserObject;
+import com.userobjects.app.service.TokenRepositoryService;
 import com.userobjects.app.service.UsersRepositoryService;
 
 @RestController
@@ -19,6 +21,9 @@ public class UserController {
 	
 	@Autowired
 	UsersRepositoryService UsersRepositoryService;
+	
+	@Autowired
+	TokenRepositoryService tokenRepositoryService;
 
 	Logger logger = LoggerFactory.getLogger(UserObjectController.class);
 	
@@ -33,6 +38,9 @@ public class UserController {
 							+ String.valueOf(rand.nextInt(10000));
 			t.setToken(String.valueOf(tok.hashCode()));
 			t.setRole(u.getUserRole());
+			t.setExpires(new Date());
+			tokenRepositoryService.createRecord(t);
+			t.setRole("");
 			logger.info(t.toString());
 		}
 		return t;
