@@ -3,12 +3,20 @@ package com.userobjects.app.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class UserAthentication {
+@Service("userAuthentication")
+public class UserAuthenticationImpl implements UserAuthentication {
 
+	@Autowired
+	TokenRepositoryService tokenRepositoryService;
+	
+	public UserAuthenticationImpl(TokenRepositoryService service) {
+		System.out.println("in user auth constructor");
+		this.tokenRepositoryService = service;
+	}
 
-	TokenRepositoryService tokenRepositoryService = new TokenRepositoryServiceImp();
-
+	@Override
 	public boolean isUserorAdmin(String token) {
 		
 		if (token != null) {

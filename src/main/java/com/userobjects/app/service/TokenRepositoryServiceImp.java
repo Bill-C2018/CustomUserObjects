@@ -10,11 +10,17 @@ import com.userobjects.app.dao.InMemTokenStore;
 import com.userobjects.app.dao.TokenRepository;
 import com.userobjects.app.model.Token;
 
-@Service
+@Service("tokenRepositoryService")
 public class  TokenRepositoryServiceImp implements TokenRepositoryService {
 
 
-	private InMemTokenStore tokenRepo = InMemTokenStore.getInstance();
+	@Autowired
+	private InMemTokenStore tokenRepo;
+	
+	public TokenRepositoryServiceImp(InMemTokenStore tokenStore) {
+		System.out.println("in repo service constructor");
+		this.tokenRepo = tokenStore;
+	}
 	
 	@Override
 	public void createRecord(Token t) {

@@ -29,7 +29,7 @@ import com.userobjects.app.model.Token;
 import com.userobjects.app.model.UserDefinedObject;
 import com.userobjects.app.model.UserObject;
 import com.userobjects.app.service.TokenRepositoryService;
-import com.userobjects.app.service.UserAthentication;
+import com.userobjects.app.service.UserAuthentication;
 import com.userobjects.app.service.UserObjectsService;
 import com.userobjects.app.service.UsersRepositoryService;
 import com.userobjects.app.utilities.Utilities;
@@ -43,8 +43,8 @@ public class UserObjectController {
 	@Autowired
 	private UserObjectsService userObjectService;
 	
-	
-	UserAthentication userAthentication = new UserAthentication();
+	@Autowired
+	UserAuthentication userAthentication;
 	
 	@Autowired
 	Utilities utils;

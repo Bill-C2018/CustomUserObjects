@@ -23,7 +23,7 @@ import com.userobjects.app.service.TokenRepositoryServiceImp;
 public class SecurityInterceptor1 implements HandlerInterceptor{
 
 	
-	TokenRepositoryService tokenRepositoryService = new TokenRepositoryServiceImp();
+//	TokenRepositoryService tokenRepositoryService = new TokenRepositoryServiceImp();
 	
 	
     @Override
