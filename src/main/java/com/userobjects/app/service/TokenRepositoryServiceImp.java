@@ -17,15 +17,7 @@ public class  TokenRepositoryServiceImp implements TokenRepositoryService {
 	@Autowired
 	private InMemTokenStore tokenRepo;
 	
-	public TokenRepositoryServiceImp() {
-		System.out.println("in default token repo service constructor");
-	}
 	
-	public void setTokenRepositoryServiceImp(InMemTokenStore tokenStore) {
-		System.out.println("in repo service setter");
-		this.tokenRepo = tokenStore;
-	}
-
 	public TokenRepositoryServiceImp(InMemTokenStore tokenStore) {
 		System.out.println("in repo service constructor");
 		this.tokenRepo = tokenStore;
