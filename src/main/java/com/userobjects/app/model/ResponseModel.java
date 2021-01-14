@@ -11,6 +11,7 @@ public class ResponseModel {
 	private String message;
 	private List<UserDefinedObject> objects;
 	private List<String> types;
+	private List<FieldErrorMessage> fieldErrors;
 	
 	public ResponseModel() {}
 	

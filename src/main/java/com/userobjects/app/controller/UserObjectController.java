@@ -4,6 +4,10 @@ package com.userobjects.app.controller;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +27,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.validation.FieldError;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.userobjects.app.model.FieldErrorMessage;
 import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.ResponseModel;
 import com.userobjects.app.model.Token;
@@ -48,10 +55,31 @@ public class UserObjectController {
 	
 	@Autowired
 	Utilities utils;
-	
 
+/*
+ * could be in a seperate class with controlleradvice annotation
+ */
+	@ExceptionHandler(ValidationException.class)
+	ResponseEntity<ResponseModel> validationExceptionHandler(ValidationException e) {
+		ResponseModel resp = new ResponseModel();
+		resp.setCode(400);
+		resp.setMessage(e.getMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	ResponseEntity<ResponseModel> argNotValideHandler(MethodArgumentNotValidException e) {
+		ResponseModel resp = new ResponseModel();
+		List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+		List<FieldErrorMessage> fieldErrorMessages = 
+				fieldErrors.stream().map(fieldError -> new FieldErrorMessage(fieldError.getField(),
+				fieldError.getDefaultMessage()))
+				.collect(Collectors.toList());
+		resp.setFieldErrors(fieldErrorMessages);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+	}	
+	 
 	@GetMapping(value = "/version/test")
-	@ResponseBody 
 	public ResponseEntity<ResponseModel> testIt(@RequestHeader(value = "access-token", required = false) String r) {
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(200);
@@ -69,10 +97,10 @@ public class UserObjectController {
 	}
 	
 	
-	@PostMapping(value = "/userobject/submitobject")
+	@PostMapping(value = "/userobject")
 	public ResponseEntity<ResponseModel> submitObject(
 			@RequestHeader(value = "access-token", required = true) String r,
-			@RequestBody UserDefinedObject userObject) {
+			@Valid @RequestBody UserDefinedObject userObject) {
 		
 		String errorCode = "";
 		ResponseModel resp = new ResponseModel();
@@ -84,16 +112,14 @@ public class UserObjectController {
 		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
 		if(newObj.size() != 0) {
 			logger.info("Duplicate Object found objectId: {}",userObject.getMyObjectId());
-			
-			resp.setCode(409);
-			resp.setMessage("That id exists");
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
+			throw new ValidationException("Duplicate objectID");
 		} else { 
 			userObject.setDateAdded(new Date());
 			//Set to 'OTHER' if not valid type
 			utils.validateObjectType(userObject);
 			logger.info("calling validate object");
-			errorCode = utils.validateObjectFields(userObject);
+	//		errorCode = utils.validateObjectFields(userObject);
+			errorCode = "";
 			if (errorCode == "") {
 				userObjectService.addUserObject(userObject);
 				logger.info("Succesfully added object { }",userObject.getMyObjectId());
@@ -144,7 +170,6 @@ public class UserObjectController {
 	}
 	
 	@DeleteMapping(value ="/userobject/deletemyobjectid/{objectId}") 
-	@ResponseBody
 	public ResponseEntity<ResponseModel> deleteByMyObjectId(
 			@RequestHeader(value = "access-token", required = true) String r,
 			@PathVariable String objectId) {

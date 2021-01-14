@@ -2,8 +2,10 @@ package com.userobjects.app.model;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.data.annotation.Id;
+
 
 import com.userobjects.app.utilities.Utilities;
 
@@ -12,12 +14,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-//lombok annotation not a reference to @Entity
-//@Data
-//try with getter setter and entity 
+
 @Getter
 @Setter
-//@Entity
+
 public final class UserDefinedObject {
 	
 
@@ -25,6 +25,7 @@ public final class UserDefinedObject {
 		public String id;
 		private String recordType;
 		private Date dateAdded;
+		@NotBlank
 		private String myObjectId;
 		private String rightAcension;
 		private String declination;
@@ -33,6 +34,13 @@ public final class UserDefinedObject {
 		private String type;
 		private String userId;
 		private String version;
+		private String magnitude;
+		private String magnitudeError;
+		private double xLocalImage;
+		private double yLocalImage;
+		private double FWHM;
+		private double elongation;
+		
 		
 		public UserDefinedObject() {
 			this.version = "0.01";
