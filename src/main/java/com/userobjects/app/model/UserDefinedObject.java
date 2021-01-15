@@ -2,37 +2,48 @@ package com.userobjects.app.model;
 
 import java.util.Date;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.data.annotation.Id;
+
 
 import com.userobjects.app.utilities.Utilities;
 
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Data;
 
 
-//lombok annotation not a reference to @Entity
-//@Data
-//try with getter setter and entity 
-@Getter
-@Setter
-//@Entity
-public final class UserDefinedObject {
+@Data
+public class UserDefinedObject {
 	
 
 		@Id
 		public String id;
+		@NotBlank
 		private String recordType;
 		private Date dateAdded;
+		@NotBlank
 		private String myObjectId;
-		private String rightAcension;
-		private String declination;
+		private double rightAcension;
+		private double declination;
 		private String otherCatalogueId;
 		private String description;
+		@NotBlank
 		private String type;
+		@NotBlank
 		private String userId;
 		private String version;
+		private double magnitude;
+		private double magnitudeError;
+		private double xvalue;
+		private double yvalue;
+		private double fwhm;
+		private double elongation;
+		
 		
 		public UserDefinedObject() {
 			this.version = "0.01";

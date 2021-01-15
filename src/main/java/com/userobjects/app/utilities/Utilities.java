@@ -35,13 +35,16 @@ public class Utilities {
 		} else if(type.equalsIgnoreCase(ObjectTypes.NEBULA)) {
 			object.setType(ObjectTypes.NEBULA);
 			return;
+		} else if(type.equalsIgnoreCase(ObjectTypes.IMAGE_STAR)) {
+			object.setType(ObjectTypes.IMAGE_STAR);
+			return;
 		} 
 		
 		object.setType(ObjectTypes.OTHER);		
 		
 	}
 	
-	
+/*	
 	//basic tests for now
 	public String validateObjectFields(UserDefinedObject o) {
 		logger.info("validating user defined object");
@@ -64,6 +67,7 @@ public class Utilities {
 		}	
 		return res;		
 	}
+*/
 	
 	public static<T> Boolean notNull(T n)  {
 		if( n == null ) {

@@ -32,7 +32,7 @@ public class UserController {
 		Token t = new Token();
 		logger.info("User data: {}, {}",u.getUserName(),u.getUserPword());
 		Optional<UserObject> ur = UsersRepositoryService.findUser(u);
-		if (!ur.isEmpty()) {
+		if (ur.isPresent()) {
 			Random rand = new Random();
 			String tok = u.getUserName() + u.getUserRole()
 							+ String.valueOf(rand.nextInt(10000));
@@ -50,7 +50,7 @@ public class UserController {
 	public Token  createUser(@RequestBody UserObject u) {
 		
 		Optional<UserObject> ur = UsersRepositoryService.findUser(u);
-		if (ur.isEmpty()) {
+		if (!ur.isPresent()) {
 			UsersRepositoryService.createUser(u);
 			return this.logInUser(u);
 		} else {
