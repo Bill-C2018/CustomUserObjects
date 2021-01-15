@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.FieldError;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.userobjects.app.model.FieldErrorMessage;
 import com.userobjects.app.model.ObjectTypes;
 import com.userobjects.app.model.ResponseModel;
@@ -100,38 +102,26 @@ public class UserObjectController {
 	@PostMapping(value = "/userobject")
 	public ResponseEntity<ResponseModel> submitObject(
 			@RequestHeader(value = "access-token", required = true) String r,
-			@Valid @RequestBody UserDefinedObject userObject) {
+			@Valid @RequestBody UserDefinedObject userDefinedObject) {
+
 		
-		String errorCode = "";
 		ResponseModel resp = new ResponseModel();
 		if (!userAthentication.isUserorAdmin(r)) {
 			resp.setCode(403);
 			resp.setMessage("access denied");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
 		}
-		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userObject.getMyObjectId());
+		List<UserDefinedObject> newObj = userObjectService.findMyObjectId(userDefinedObject.getMyObjectId());
 		if(newObj.size() != 0) {
-			logger.info("Duplicate Object found objectId: {}",userObject.getMyObjectId());
+			logger.info("Duplicate Object found objectId: {}",userDefinedObject.getMyObjectId());
 			throw new ValidationException("Duplicate objectID");
 		} else { 
-			userObject.setDateAdded(new Date());
-			//Set to 'OTHER' if not valid type
-			utils.validateObjectType(userObject);
-			logger.info("calling validate object");
-	//		errorCode = utils.validateObjectFields(userObject);
-			errorCode = "";
-			if (errorCode == "") {
-				userObjectService.addUserObject(userObject);
-				logger.info("Succesfully added object { }",userObject.getMyObjectId());
-				resp.setCode(200);
-				resp.setMessage("OK");
-				return ResponseEntity.status(HttpStatus.OK).body(resp);
-			} else {
-				logger.info("Failed to add object { },{ } ",userObject.getMyObjectId(),errorCode);
-				resp.setMessage(errorCode);
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
-			}
-			
+			userDefinedObject.setDateAdded(new Date());
+			userObjectService.addUserObject(userDefinedObject);
+			logger.info("Succesfully added object { }",userDefinedObject.getMyObjectId());
+			resp.setCode(200);
+			resp.setMessage("OK");
+			return ResponseEntity.status(HttpStatus.OK).body(resp);
 
 		}
 
@@ -139,14 +129,19 @@ public class UserObjectController {
 	}
 	
 
-	@GetMapping(value = "/userobject/userobject")
+	@GetMapping(value = "/userobject")
 	public ResponseEntity<ResponseModel> getUserObjectbyMyUserId(
 						@RequestHeader(value = "access-token", required = true) String r,
 						@RequestParam String objectId) {
 
 		logger.info("get object : object user id {}", objectId);
 		logger.info("access-token -> {}", r);
-		
+		if (objectId == null || (objectId.trim().length()) < 1 ) {
+			logger.info("invalid object id: {}",objectId);
+			throw new ValidationException("invalid objectID");
+			
+		}
+			
 		ResponseModel resp = new ResponseModel();
 		if (!userAthentication.isUserorAdmin(r)) {
 			resp.setCode(403);
@@ -169,14 +164,14 @@ public class UserObjectController {
 		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
-	@DeleteMapping(value ="/userobject/deletemyobjectid/{objectId}") 
+	@DeleteMapping(value ="/userobject/{objectId}") 
 	public ResponseEntity<ResponseModel> deleteByMyObjectId(
 			@RequestHeader(value = "access-token", required = true) String r,
 			@PathVariable String objectId) {
 		
 		ResponseModel resp = new ResponseModel();
 		if (!userAthentication.isUserorAdmin(r)) {
-			resp.setCode(409);
+			resp.setCode(403);
 			resp.setMessage("access denied");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
 		}
@@ -203,8 +198,7 @@ public class UserObjectController {
 		return ResponseEntity.status(HttpStatus.OK).body(resp);
 	}
 	
-	@PostMapping(value = "/userobject/editobject")
-	@ResponseBody
+	@PutMapping(value = "/userobject")
 	public ResponseModel editObject(
 			@RequestHeader(value = "access-token", required = true) String r,
 			@RequestBody UserDefinedObject userObject) {
@@ -233,10 +227,10 @@ public class UserObjectController {
 		return resp;
 	}
 	
-	@GetMapping("/userobject/listall/{filter}")
+	@GetMapping("/userobject/{typefilter}")
 	public ResponseEntity<ResponseModel> listAllofType(
 			@RequestHeader(value = "access-token", required = true) String r,
-			@PathVariable(name="filter")  String filter) {
+			@PathVariable(name="typefilter")  String filter) {
 	
 		logger.info("In list all method with filter = {}",filter);
 		ResponseModel resp = new ResponseModel();

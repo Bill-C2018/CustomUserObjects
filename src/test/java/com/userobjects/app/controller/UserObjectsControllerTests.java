@@ -60,7 +60,7 @@ public class UserObjectsControllerTests {
 	private TestRestTemplate restTemplate;
 
 	private UserObjectsService mocksvc = mock(UserObjectsService.class);
-	
+/*	
 	@BeforeAll 
 	public void setUp() {
 		ReflectionTestUtils.setField(controller, "userObjectService", mocksvc);
@@ -98,7 +98,7 @@ public class UserObjectsControllerTests {
 		
 	}
 												
-
+*/
 	@Test
 	void contextLoads() {
 		assertThat(controller).isNotNull();
