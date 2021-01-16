@@ -58,63 +58,55 @@ public class UserObjectsControllerTests {
 	
 	@Autowired
 	private TestRestTemplate restTemplate;
-
-	private UserObjectsService mocksvc = mock(UserObjectsService.class);
-/*	
+	
 	@BeforeAll 
 	public void setUp() {
 		ReflectionTestUtils.setField(controller, "userObjectService", mocksvc);
 	}
-	
+
+	private UserObjectsService mocksvc = mock(UserObjectsService.class);
+
 	private UserDefinedObject genUserDefinedObject(String myid,String description, String ra, String declination,
-													String catalogue, String type) {
-		
+			String catalogue, String type) {
+
 		UserDefinedObject udo = new UserDefinedObject();
-		if (utils.notNull(myid)) {
+		if (myid != null) {
 			udo.setMyObjectId(myid);
 		}
-
-		if (utils.notNull(description)) {
+		
+		if (description != null) {
 			udo.setDescription(description);
 		}
 		
-		if (utils.notNull(ra)) {
-			udo.setRightAcension(ra);
-		}
+		if(ra != null) udo.setRightAcension(Double.parseDouble(ra));
+		if(declination != null) udo.setDeclination(Double.parseDouble(declination));
+	
 		
-		if (utils.notNull(declination)) {
-			udo.setDeclination(declination);
-		}	
-		
-		if (utils.notNull(catalogue)) {
+		if (catalogue != null) {
 			udo.setOtherCatalogueId(catalogue);
 		}	
-
-		if (utils.notNull(type)) {
+		
+		if (type != null) {
 			udo.setType(type);
 		}
 		
-		return udo;
+		udo.setUserId("9999");
 		
-	}
-												
-*/
+		return udo;
+
+}
+
+
 	@Test
 	void contextLoads() {
 		assertThat(controller).isNotNull();
 	}
-/*	
+	
 	@Test
 	void testItTest() throws Exception {
 		ResponseEntity<ResponseModel> response = controller.testIt("");
 		assertThat(response.getStatusCodeValue() == 200).isTrue();
 		assertThat(response.getBody().getMessage()).contains("Version = 5.2.9.RELEASE");
-	}
-	
-	@Test
-	void getTypesTest() throws Exception {
-		ResponseEntity<ResponseModel> response = controller.getTypes();
-		assertThat(response.getBody().getTypes().size() == 4).isTrue();
 	}
 	
 	@Test
@@ -135,75 +127,66 @@ public class UserObjectsControllerTests {
 		
 		when(mocksvc.findMyObjectId("00001")).thenReturn(newObj);
 
-		
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+
+        //Create a new HttpEntity
+        final HttpEntity<String> entity = new HttpEntity<String>(headers);		
 
 		String uri = "http://localhost:";
-		uri += port + "/userobject/userobject?objectId=00001";
-		ResponseEntity<ResponseModel> response = this.restTemplate.getForEntity(uri, ResponseModel.class);
+		uri += port + "/userobject?objectId=00001";
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, ResponseModel.class); 
 		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
 		List<UserDefinedObject> ll = bdy.getObjects();
 		assertThat(ll.get(0).getDescription()).contains("test object");
 		//
 		 // make sure not found works as well
 		 //
 		uri = "http://localhost:";
-		uri += port + "/userobject/userobject?objectId=00007";
-		response = this.restTemplate.getForEntity(uri, ResponseModel.class);
+		uri += port + "/userobject?objectId=00007";
+		response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, ResponseModel.class); 
 		bdy = response.getBody();
 		assertThat(bdy.getCode() == 404).isTrue();			
-	}
-
-	@Test
-	void deleteByMyObjectIdTest() throws Exception {
-
-		UserDefinedObject udo = genUserDefinedObject("00001", "test object", null, null, null, null);
-		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
-		newObj.add(udo);
-		when(mocksvc.findMyObjectId("00001")).thenReturn(newObj);
-		
-		ResponseEntity<ResponseModel> response = controller.deleteByMyObjectId("00002");
-		ResponseModel bdy = response.getBody();
-		assertThat(bdy.getCode() == 404).isTrue();	
-		
-		response = controller.deleteByMyObjectId("00001");
-		bdy = response.getBody();
-		assertThat(bdy.getCode() == 200).isTrue();			
-	}
-		
-	@Test 
-	void deleteByMyObjectIdConflictTest() throws Exception {
-		
-		UserDefinedObject udo = genUserDefinedObject("00001", "test object", null, null, null, null);
-		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
-		newObj.add(udo);
-		udo = genUserDefinedObject("00001", "test object 2", null, null, null, null);
-		newObj.add(udo);
-
-		when(mocksvc.findMyObjectId("00001")).thenReturn(newObj);
-		
-		ResponseEntity<ResponseModel> response = controller.deleteByMyObjectId("00001");
-		ResponseModel bdy = response.getBody();
-		assertThat(bdy.getCode() == 409).isTrue();	
-		
 	}
 	
 	@Test
 	void submitObjectTest() throws Exception {
-		
 
-		UserDefinedObject udo = genUserDefinedObject("00001", "test object", null, null, null, null);
-		
+		UserDefinedObject udo = genUserDefinedObject("00002", "test object", null, null, null, "Star");
 		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
 		newObj.add(udo);
 		
 		when(mocksvc.findMyObjectId("00001")).thenReturn(newObj);
+		when(mocksvc.addUserObject(udo)).thenReturn(200);
 		
-		udo = genUserDefinedObject("00001", "test object", null, null, null, null);
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+        //Create a new HttpEntity
+        HttpEntity<?> entity = new HttpEntity<>(udo,headers);	
+		String uri = "http://localhost:";
+		uri += port + "/userobject";        
+		ResponseEntity<ResponseModel> response = this.restTemplate.postForEntity(uri, entity, ResponseModel.class);
+		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 200).isTrue();
 		
-		ResponseEntity<ResponseModel> response = controller.submitObject(udo);
-		int a = 0;
-		
+		//now make sure it works if we find a dup
+		when(mocksvc.findMyObjectId("00002")).thenReturn(newObj);
+		response = this.restTemplate.postForEntity(uri, entity, ResponseModel.class);
+		bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 400).isTrue();	
+		//now make sure it fails on empty customid
+		udo.setMyObjectId("");
+		HttpEntity<?> entity2 = new HttpEntity<>(udo,headers);
+		response = this.restTemplate.postForEntity(uri, entity2, ResponseModel.class);
+		bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 400).isTrue();
 
 	}
-*/
+
+	
+
 }
