@@ -78,6 +78,7 @@ public class UserObjectController {
 				fieldError.getDefaultMessage()))
 				.collect(Collectors.toList());
 		resp.setFieldErrors(fieldErrorMessages);
+		resp.setCode(400);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
 	}	
 	 

@@ -6,7 +6,10 @@ public class FieldErrorMessage {
 	private String message;
 	
 	
+	public FieldErrorMessage() { }
+		
 	public FieldErrorMessage(String field, String message) {
+
 		super();
 		this.field = field;
 		this.message = message;

@@ -19,13 +19,20 @@ public class UsersRepositoryServiceImp implements UsersRepositoryService{
 		this.usersRepo = usersRepo;
 	}
 	
-	public void createUser(UserObject u) {
+	@Override
+	public UserObject createUser(UserObject u) {
 		usersRepo.save(u);
+		return u;
 	}
 	
 	@Override
 	public Optional<UserObject> findUser(UserObject user) {
 		return usersRepo.findByUserNameAndUserPword(user.getUserName(),user.getUserPword());
+	}
+	
+	@Override
+	public Optional<UserObject> findUser(String name,String pword) {
+		return usersRepo.findByUserNameAndUserPword(name,pword);
 	}
 
 

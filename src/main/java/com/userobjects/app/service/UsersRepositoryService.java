@@ -6,7 +6,8 @@ import com.userobjects.app.model.UserObject;
 
 public interface UsersRepositoryService {
 
-	public void createUser(UserObject u);
+	public UserObject createUser(UserObject u);
 	
 	public Optional<UserObject> findUser(UserObject user );
+	public Optional<UserObject> findUser(String name, String pword);
 }
