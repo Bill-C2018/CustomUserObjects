@@ -20,7 +20,7 @@ import com.userobjects.app.service.UsersRepositoryService;
 public class UserController {
 	
 	@Autowired
-	UsersRepositoryService UsersRepositoryService;
+	UsersRepositoryService usersRepositoryService;
 	
 	@Autowired
 	TokenRepositoryService tokenRepositoryService;
@@ -31,7 +31,7 @@ public class UserController {
 	public Token logInUser(@RequestBody UserObject u) {
 		Token t = new Token();
 		logger.info("User data: {}, {}",u.getUserName(),u.getUserPword());
-		Optional<UserObject> ur = UsersRepositoryService.findUser(u);
+		Optional<UserObject> ur = usersRepositoryService.findUser(u.getUserName(),u.getUserPword());
 		if (ur.isPresent()) {
 			Random rand = new Random();
 			String tok = u.getUserName() + u.getUserRole()
@@ -49,10 +49,10 @@ public class UserController {
 	@PostMapping("/user/createuser")
 	public Token  createUser(@RequestBody UserObject u) {
 		
-		Optional<UserObject> ur = UsersRepositoryService.findUser(u);
+		Optional<UserObject> ur = usersRepositoryService.findUser(u.getUserName(),u.getUserPword());
 		if (!ur.isPresent()) {
-			UsersRepositoryService.createUser(u);
-			return this.logInUser(u);
+			UserObject newu = usersRepositoryService.createUser(u);
+			return this.logInUser(newu);
 		} else {
 			Token t = new Token();
 			return t;

@@ -34,8 +34,9 @@ public class UserObjectsService {
 		userObjects.deleteById(objectId);
 	}
 	
-	public void updateUserObject(UserDefinedObject object) {
-		userObjects.save(object);
+	public UserDefinedObject  updateUserObject(UserDefinedObject uobject) {
+		userObjects.save(uobject);
+		return uobject;
 	}
 	
 	public List<UserDefinedObject> findAllByType(String type) {

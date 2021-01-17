@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 import org.junit.*; 
 import org.junit.jupiter.api.BeforeAll;
@@ -70,6 +70,7 @@ public class UserObjectsControllerTests {
 			String catalogue, String type) {
 
 		UserDefinedObject udo = new UserDefinedObject();
+		udo.setId("12345");
 		if (myid != null) {
 			udo.setMyObjectId(myid);
 		}
@@ -166,7 +167,8 @@ public class UserObjectsControllerTests {
         HttpEntity<?> entity = new HttpEntity<>(udo,headers);	
 		String uri = "http://localhost:";
 		uri += port + "/userobject";        
-		ResponseEntity<ResponseModel> response = this.restTemplate.postForEntity(uri, entity, ResponseModel.class);
+//		ResponseEntity<ResponseModel> response = this.restTemplate.postForEntity(uri, entity, ResponseModel.class);
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.POST, entity, ResponseModel.class);
 		ResponseModel bdy = response.getBody();
 		System.out.println(bdy);
 		assertThat(bdy.getCode() == 200).isTrue();
@@ -184,6 +186,99 @@ public class UserObjectsControllerTests {
 		bdy = response.getBody();
 		System.out.println(bdy);
 		assertThat(bdy.getCode() == 400).isTrue();
+
+	}
+	
+	@Test
+	void getListOfTypes() throws Exception {
+
+		String uri = "http://localhost:";
+		uri += port + "/userobject/types";
+		ResponseEntity<ResponseModel> response = this.restTemplate.getForEntity(uri, ResponseModel.class);
+		System.out.println(response.getBody());
+		assertThat(response.getBody().getTypes().size() == 5).isTrue();
+
+	}
+
+
+	@Test
+	void deleteRecord() throws Exception {
+		UserDefinedObject udo = genUserDefinedObject("00003", "test object", null, null, null, "Star");
+		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
+		newObj.add(udo);
+		
+		when(mocksvc.findMyObjectId("00003")).thenReturn(newObj);
+		
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+        //Create a new HttpEntity
+        HttpEntity<?> entity = new HttpEntity<>(headers);	
+		String uri = "http://localhost:";
+		uri += port + "/userobject/" + udo.getMyObjectId();        
+//		ResponseEntity<ResponseModel> response = this.restTemplate.postForEntity(uri, entity, ResponseModel.class);
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.DELETE, entity, ResponseModel.class);
+		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 200).isTrue();
+	}
+	
+	@Test
+	void deleteRecordNotFound() throws Exception {
+		UserDefinedObject udo = genUserDefinedObject("00003", "test object", null, null, null, "Star");
+		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
+		when(mocksvc.findMyObjectId("00003")).thenReturn(newObj);
+		
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);	
+		String uri = "http://localhost:";
+		uri += port + "/userobject/" + udo.getMyObjectId();        
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.DELETE, entity, ResponseModel.class);
+		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 404).isTrue();
+	}
+	
+	@Test
+	void updateRecord() throws Exception {
+		UserDefinedObject udo = genUserDefinedObject("00004", "test object", null, null, null, "Star");
+		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
+		newObj.add(udo);
+		Optional oudo = Optional.of(udo);
+		when(mocksvc.findById(udo.getId())).thenReturn(oudo);
+		when(mocksvc.updateUserObject(udo)).thenReturn(udo);
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+
+        HttpEntity<?> entity = new HttpEntity<>(udo,headers);	
+		String uri = "http://localhost:";
+		uri += port + "/userobject";        
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.PUT, entity, ResponseModel.class);
+		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 200).isTrue();
+
+	}
+
+	@Test
+	void updateRecordNotFound() throws Exception {
+		UserDefinedObject udo = genUserDefinedObject("00004", "test object", null, null, null, "Star");
+		List<UserDefinedObject> newObj = new ArrayList<UserDefinedObject>();
+		newObj.add(udo);
+		Optional oudo = Optional.empty();
+		when(mocksvc.findById(udo.getId())).thenReturn(oudo);
+		when(mocksvc.updateUserObject(udo)).thenReturn(udo);
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+
+        HttpEntity<?> entity = new HttpEntity<>(udo,headers);	
+		String uri = "http://localhost:";
+		uri += port + "/userobject";        
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.PUT, entity, ResponseModel.class);
+		ResponseModel bdy = response.getBody();
+		System.out.println(bdy);
+		assertThat(bdy.getCode() == 404).isTrue();
 
 	}
 
