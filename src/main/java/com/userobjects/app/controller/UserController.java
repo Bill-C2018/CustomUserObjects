@@ -40,7 +40,7 @@ public class UserController {
 			t.setRole(u.getUserRole());
 			t.setExpires(new Date());
 			tokenRepositoryService.createRecord(t);
-			t.setRole("");
+//			t.setRole("");
 			logger.info(t.toString());
 		}
 		return t;
