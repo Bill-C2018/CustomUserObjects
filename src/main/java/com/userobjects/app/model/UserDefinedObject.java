@@ -43,6 +43,7 @@ public class UserDefinedObject {
 		private double yvalue;
 		private double fwhm;
 		private double elongation;
+		private String sourceFileName;
 		
 		
 		public UserDefinedObject() {

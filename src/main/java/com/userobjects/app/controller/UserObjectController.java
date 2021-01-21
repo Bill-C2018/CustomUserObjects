@@ -1,6 +1,7 @@
 package com.userobjects.app.controller;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.SpringVersion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -240,11 +244,31 @@ public class UserObjectController {
 			resp.setMessage("access denied");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN ).body(resp);
 		}
+		
+		String[] parts = filter.split(":");
+		filter = parts[0];
+		int pagenumber = Integer.parseInt(parts[1]);
+		int pageSize = Integer.parseInt(parts[2]);
+		
 
-		List results = userObjectService.findAllByType(filter);
+//		List results = userObjectService.findAllByType(filter);
+//		resp.setObjects(results);
+//		return ResponseEntity.ok(resp);
+
+		List<UserDefinedObject> results = new ArrayList<UserDefinedObject>();
+		Pageable paging = PageRequest.of(pagenumber, pageSize);
+		Page<UserDefinedObject> pageObs;
+		
+		pageObs = userObjectService.findAllByType(filter, paging);
+		results = pageObs.getContent();
+		
 		resp.setObjects(results);
+		resp.setCurrentPage(String.valueOf(pageObs.getNumber()));
+		resp.setTotalItems(String.valueOf(pageObs.getTotalElements()));
+		resp.setTotalPages(String.valueOf(pageObs.getTotalPages()));
+
 		return ResponseEntity.ok(resp);
-	
+		
 	}
 	
 			
