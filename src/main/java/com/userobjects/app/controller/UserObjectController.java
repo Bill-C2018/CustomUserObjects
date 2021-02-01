@@ -67,6 +67,7 @@ public class UserObjectController {
  */
 	@ExceptionHandler(ValidationException.class)
 	ResponseEntity<ResponseModel> validationExceptionHandler(ValidationException e) {
+		logger.info("validation execption {}",e.getMessage());
 		ResponseModel resp = new ResponseModel();
 		resp.setCode(400);
 		resp.setMessage(e.getMessage());
@@ -206,7 +207,7 @@ public class UserObjectController {
 	@PutMapping(value = "/userobject")
 	public ResponseModel editObject(
 			@RequestHeader(value = "access-token", required = true) String r,
-			@RequestBody UserDefinedObject userObject) {
+			@Valid @RequestBody UserDefinedObject userObject) {
 		
 		logger.info("update object { }",userObject.getUserId());
 		ResponseModel resp = new ResponseModel();
@@ -235,7 +236,7 @@ public class UserObjectController {
 	@GetMapping("/userobject/{typefilter}")
 	public ResponseEntity<ResponseModel> listAllofType(
 			@RequestHeader(value = "access-token", required = true) String r,
-			@PathVariable(name="typefilter")  String filter) {
+			@PathVariable(name="typefilter", required = true)  String filter) {
 	
 		logger.info("In list all method with filter = {}",filter);
 		ResponseModel resp = new ResponseModel();
@@ -246,27 +247,52 @@ public class UserObjectController {
 		}
 		
 		String[] parts = filter.split(":");
-		filter = parts[0];
-		int pagenumber = Integer.parseInt(parts[1]);
-		int pageSize = Integer.parseInt(parts[2]);
+		if (parts.length < 2) {
+			throw new ValidationException("invalid filter");
+		}
+		String column = parts[0];
+		filter = parts[1];
+		int pageNumber = 1;
+		int pageSize = 10;
+		try {
+			if( parts.length > 2) {
+				pageNumber = Integer.parseInt(parts[2]);
+			}
+			if( parts.length == 4) {
+				pageSize = Integer.parseInt(parts[3]);
+			}
+		} catch (NumberFormatException e) {
+			throw new ValidationException("Invalid page size or number");
+		}
 		
+		if (pageSize < 1 || pageNumber < 0) {
+			throw new ValidationException("Invalid page size or number");
+		}
 
 //		List results = userObjectService.findAllByType(filter);
 //		resp.setObjects(results);
 //		return ResponseEntity.ok(resp);
 
 		List<UserDefinedObject> results = new ArrayList<UserDefinedObject>();
-		Pageable paging = PageRequest.of(pagenumber, pageSize);
-		Page<UserDefinedObject> pageObs;
+		Pageable paging = PageRequest.of(pageNumber, pageSize);
+		Page<UserDefinedObject> pageObs = null;
 		
-		pageObs = userObjectService.findAllByType(filter, paging);
-		results = pageObs.getContent();
+		if(column.equalsIgnoreCase("type")) {
+			pageObs = userObjectService.findAllByType(filter, paging);
+		} else if(column.equalsIgnoreCase("imagename")) {
+			pageObs = userObjectService.findAllBySourceFileName(filter,paging);
+			
+		} else {
+			throw new ValidationException("Invalid column name");
+		}
 		
-		resp.setObjects(results);
-		resp.setCurrentPage(String.valueOf(pageObs.getNumber()));
-		resp.setTotalItems(String.valueOf(pageObs.getTotalElements()));
-		resp.setTotalPages(String.valueOf(pageObs.getTotalPages()));
-
+		if(pageObs != null) {
+			results = pageObs.getContent();
+			resp.setObjects(results);
+			resp.setCurrentPage(String.valueOf(pageObs.getNumber()));
+			resp.setTotalItems(String.valueOf(pageObs.getTotalElements()));
+			resp.setTotalPages(String.valueOf(pageObs.getTotalPages()));
+		}
 		return ResponseEntity.ok(resp);
 		
 	}

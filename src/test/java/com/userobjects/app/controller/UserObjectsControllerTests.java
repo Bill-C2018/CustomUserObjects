@@ -98,6 +98,7 @@ public class UserObjectsControllerTests {
 }
 
 
+
 	@Test
 	void contextLoads() {
 		assertThat(controller).isNotNull();
@@ -279,6 +280,28 @@ public class UserObjectsControllerTests {
 		ResponseModel bdy = response.getBody();
 		System.out.println(bdy);
 		assertThat(bdy.getCode() == 404).isTrue();
+
+	}
+	
+	@Test
+	void testFilteredSearch() throws Exception {
+		HttpHeaders headers = new HttpHeaders();
+        headers.set("access-token", "123456789");
+
+        //Create a new HttpEntity
+        final HttpEntity<String> entity = new HttpEntity<String>(headers);		
+
+		String uri = "http://localhost:";
+		uri += port + "/userobject/" + "bob:Star";
+		ResponseEntity<ResponseModel> response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, ResponseModel.class); 
+		ResponseModel bdy = response.getBody();
+		assertThat(bdy.getCode() == 400).isTrue();
+
+		uri = "http://localhost:";
+		uri += port + "/userobject/" + "type:";
+		response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, ResponseModel.class); 
+		bdy = response.getBody();
+		assertThat(bdy.getCode() == 400).isTrue();
 
 	}
 

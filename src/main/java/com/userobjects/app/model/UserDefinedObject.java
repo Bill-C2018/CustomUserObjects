@@ -23,18 +23,18 @@ public class UserDefinedObject {
 
 		@Id
 		public String id;
-		@NotBlank
+		@NotBlank(message = "RecordType can not be blank")
 		private String recordType;
 		private Date dateAdded;
-		@NotBlank
+		@NotBlank(message = "myObjectId can not be blank")
 		private String myObjectId;
 		private double rightAcension;
 		private double declination;
 		private String otherCatalogueId;
 		private String description;
-		@NotBlank
+		@NotBlank(message = "type can not be blank")
 		private String type;
-		@NotBlank
+		@NotBlank(message = "userId can not be blank")
 		private String userId;
 		private String version;
 		private double magnitude;

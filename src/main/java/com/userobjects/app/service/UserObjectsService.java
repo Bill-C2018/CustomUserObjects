@@ -48,4 +48,8 @@ public class UserObjectsService {
 	public Page<UserDefinedObject> findAllByType(String type, Pageable pageable) {
 		return userObjects.findAllByType(type,pageable);
 	}
+	
+	public Page<UserDefinedObject> findAllBySourceFileName(String imageName, Pageable pageable) {
+		return userObjects.findBySourceFileNameLike(imageName,pageable);
+	}
 }
