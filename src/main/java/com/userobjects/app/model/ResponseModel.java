@@ -12,6 +12,9 @@ public class ResponseModel {
 	private List<UserDefinedObject> objects;
 	private List<String> types;
 	private List<FieldErrorMessage> fieldErrors;
+	private String currentPage;
+	private String totalItems;
+	private String totalPages;
 	
 	public ResponseModel() {}
 	
