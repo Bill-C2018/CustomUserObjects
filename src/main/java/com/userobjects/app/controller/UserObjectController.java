@@ -281,6 +281,7 @@ public class UserObjectController {
 			pageObs = userObjectService.findAllByType(filter, paging);
 		} else if(column.equalsIgnoreCase("imagename")) {
 			pageObs = userObjectService.findAllBySourceFileName(filter,paging);
+//			pageObs = userObjectService.findBySourceFileNameLikeAndType(filter,"Test",paging);
 			
 		} else {
 			throw new ValidationException("Invalid column name");
@@ -295,6 +296,32 @@ public class UserObjectController {
 		}
 		return ResponseEntity.ok(resp);
 		
+	}
+	
+	@GetMapping("/userobject/compare")
+	public ResponseEntity<ResponseModel> getCompareResults(
+			@RequestHeader(value = "access-token", required = true) String r,
+			@RequestParam String imageName1,
+			@RequestParam String imageName2) {
+
+		logger.info("compare two files {}  {}", imageName1, imageName2);
+		logger.info("access-token -> {}", r);
+		if ((imageName1.trim().length()) < 1 || imageName2.trim().length() < 1) {
+			logger.info("invalid image name: {} {}",imageName1,imageName2);
+			throw new ValidationException("invalid imageName");
+		}
+		
+		ResponseModel resp = new ResponseModel();
+		if (!userAthentication.isUserorAdmin(r)) {
+			resp.setCode(403);
+			resp.setMessage("access denied");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN ).body(resp);
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK ).body(resp);
+
+
+
 	}
 	
 			
