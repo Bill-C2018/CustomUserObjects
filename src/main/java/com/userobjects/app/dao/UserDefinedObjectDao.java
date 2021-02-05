@@ -20,5 +20,8 @@ public interface UserDefinedObjectDao extends MongoRepository<UserDefinedObject,
 
 	Page<UserDefinedObject> findBySourceFileNameLike(String imageName, Pageable pageable);
 
-	
+	Page<UserDefinedObject> findBySourceFileNameLikeAndType(String imageName,String type,Pageable pageable);
+
+	List<UserDefinedObject> findAllBySourceFileName(String imageName);
+
 }

@@ -52,4 +52,14 @@ public class UserObjectsService {
 	public Page<UserDefinedObject> findAllBySourceFileName(String imageName, Pageable pageable) {
 		return userObjects.findBySourceFileNameLike(imageName,pageable);
 	}
+	
+	public List<UserDefinedObject> findAllBySourceFileName(String imageName) {
+		return userObjects.findAllBySourceFileName(imageName);
+	}
+
+	
+	public Page<UserDefinedObject> findBySourceFileNameLikeAndType(String imageName,String type,Pageable pageable) {
+		return userObjects.findBySourceFileNameLikeAndType(imageName,type,pageable);
+	}
+	
 }
