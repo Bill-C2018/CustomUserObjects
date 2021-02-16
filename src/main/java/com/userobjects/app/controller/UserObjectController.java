@@ -1,6 +1,8 @@
 package com.userobjects.app.controller;
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -318,6 +320,52 @@ public class UserObjectController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN ).body(resp);
 		}
 		
+		List<UserDefinedObject> results = new ArrayList<UserDefinedObject>();
+		
+		List<UserDefinedObject> newObj1 = userObjectService.findAllBySourceFileName(imageName1);
+		List<UserDefinedObject> newObj2 = userObjectService.findAllBySourceFileName(imageName2);
+		/*
+		Double toBeTruncated = new Double("3.5789055");
+
+		Double truncatedDouble = BigDecimal.valueOf(toBeTruncated)
+		    .setScale(3, RoundingMode.HALF_UP)
+		    .doubleValue();		
+		*/
+		//results.add(newObj1.get(0));
+		results.addAll(newObj2);
+		for (int i = 0; i < newObj1.size(); i++) {
+			
+			double lowestra = 0.0;
+			double lowestdec = 0.0;
+			double lowestsum = 900.0;
+			int lowestIndex = -1;
+			
+			
+			for (int j = 0; j < newObj2.size(); j++) {
+				UserDefinedObject o = results.get(j);
+				double ra = (
+						BigDecimal.valueOf(o.getRightAcension()-newObj1.get(i).getRightAcension())
+						.setScale(4,RoundingMode.HALF_UP)
+						.doubleValue());
+				
+				double dec = (
+						BigDecimal.valueOf(o.getDeclination()-newObj1.get(i).getDeclination())
+						.setScale(4,RoundingMode.HALF_UP)
+						.doubleValue());
+				
+				if((Math.abs(ra) + Math.abs(dec)) < lowestsum) {
+					lowestsum = Math.abs(ra) + Math.abs(dec);
+					lowestra = ra;
+					lowestdec = dec;
+					lowestIndex = j;
+				}
+	
+			}
+			results.get(lowestIndex).setRightAcension(lowestra);
+			results.get(lowestIndex).setDeclination(lowestdec);
+			
+		}
+		resp.setObjects(results);
 		return ResponseEntity.status(HttpStatus.OK ).body(resp);
 
 
